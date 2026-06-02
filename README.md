@@ -8,5 +8,5 @@ Este proyecto tiene como objetivo presentar datos desde una API pública (JSONPl
 * Ordenar alfabéticamente los nombres de los usuarios extraídos.
 
 ## Autor/a
-* Katherine Concha G
+* Katherine Concha Gonzalez
 * https://github.com/katherineconcha/gestor-usuarios-api.git
