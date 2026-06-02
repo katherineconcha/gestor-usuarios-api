@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador de Usuarios API</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .botones-container { display: flex; flex-direction: column; gap: 10px; max-width: 400px; }
+        button { padding: 10px; cursor: pointer; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <h2>Gestor de Usuarios JSONPlaceholder</h2>
+    <p>Abre la consola de tu navegador (F12) para ver los resultados.</p>
+
+    <div class="botones-container">
+        <button onclick="app.listarTodosLosNombres()">1. Listar todos los nombres</button>
+        <button onclick="app.mostrarInfoBasica()">2. Info básica por usuario</button>
+        <button onclick="app.mostrarDireccion()">3. Dirección por usuario</button>
+        <button onclick="app.mostrarInfoAvanzada()">4. Info avanzada por usuario</button>
+        <button onclick="app.listarCompanias()">5. Listar compañías y catchphrase</button>
+        <button onclick="app.listarNombresOrdenados()">6. Listar nombres ordenados alfabéticamente</button>
+    </div>
+
+    <script>
+        class AdministradorUsuarios {
+            constructor() {
+                // El constructor inicializa el arreglo y realiza la petición
+                this.usuarios = [];
+                this.obtenerDatos();
+            }
+
+            // Método interno para pedir la data mediante XMLHttpRequest
+            obtenerDatos() {
+                const xhr = new XMLHttpRequest();
+                xhr.open("GET", "https://jsonplaceholder.typicode.com/users", true);
+                
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        this.usuarios = JSON.parse(xhr.responseText);
+                        console.log("Datos cargados exitosamente. Listo para operar.");
+                    } else {
+                        console.error("Error al obtener los datos del servidor.");
+                    }
+                };
+                
+                xhr.send();
+            }
+
+            // --- Método de ayuda (reutilizable) para buscar usuario ---
+            _buscarUsuarioPorPrompt() {
+                const nombreIngresado = prompt("Por favor, ingrese el nombre del usuario (ej. Leanne Graham):");
+                if (!nombreIngresado) {
+                    console.log("Búsqueda cancelada.");
+                    return null;
+                }
+                
+                // Búsqueda insensible a mayúsculas/minúsculas
+                const usuarioEncontrado = this.usuarios.find(user => 
+                    user.name.toLowerCase() === nombreIngresado.toLowerCase()
+                );
+
+                if (!usuarioEncontrado) {
+                    console.warn(`No se encontró ningún usuario con el nombre "${nombreIngresado}".`);
+                }
+
+                return usuarioEncontrado;
+            }
+
+            // --- 1. Listar los nombres de todos los usuarios ---
+            listarTodosLosNombres() {
+                console.log("--- NOMBRES DE TODOS LOS USUARIOS ---");
+                this.usuarios.forEach(user => {
+                    console.log(user.name);
+                });
+            }
+
+            // --- 2. Pedir nombre y mostrar información básica ---
+            mostrarInfoBasica() {
+                const usuario = this._buscarUsuarioPorPrompt();
+                if (usuario) {
+                    console.log(`--- INFO BÁSICA: ${usuario.name} ---`);
+                    console.log(`Username: ${usuario.username}`);
+                    console.log(`Correo: ${usuario.email}`);
+                }
+            }
+
+            // --- 3. Pedir nombre y listar dirección completa ---
+            mostrarDireccion() {
+                const usuario = this._buscarUsuarioPorPrompt();
+                if (usuario) {
+                    console.log(`--- DIRECCIÓN: ${usuario.name} ---`);
+                    console.log(`Calle: ${usuario.address.street}`);
+                    console.log(`Suite/Depto: ${usuario.address.suite}`);
+                    console.log(`Ciudad: ${usuario.address.city}`);
+                    console.log(`Código Postal: ${usuario.address.zipcode}`);
+                    console.log(`Coordenadas: Lat ${usuario.address.geo.lat}, Lng ${usuario.address.geo.lng}`);
+                }
+            }
+
+            // --- 4. Pedir nombre y listar información avanzada ---
+            mostrarInfoAvanzada() {
+                const usuario = this._buscarUsuarioPorPrompt();
+                if (usuario) {
+                    console.log(`--- INFO AVANZADA: ${usuario.name} ---`);
+                    console.log(`Teléfono: ${usuario.phone}`);
+                    console.log(`Sitio Web: ${usuario.website}`);
+                    console.log(`COMPAÑÍA:`);
+                    console.log(` - Nombre: ${usuario.company.name}`);
+                    console.log(` - Frase (Catchphrase): ${usuario.company.catchPhrase}`);
+                    console.log(` - BS: ${usuario.company.bs}`);
+                }
+            }
+
+            // --- 5. Listar todas las compañías junto a su frase clave ---
+            listarCompanias() {
+                console.log("--- COMPAÑÍAS Y FRASES CLAVE ---");
+                this.usuarios.forEach(user => {
+                    console.log(`Empresa: ${user.company.name} | Frase: "${user.company.catchPhrase}"`);
+                });
+            }
+
+            // --- 6. Listar los nombres ordenados alfabéticamente ---
+            listarNombresOrdenados() {
+                console.log("--- NOMBRES ORDENADOS ALFABÉTICAMENTE ---");
+                // Creamos un nuevo arreglo solo con los nombres para no alterar el original
+                const nombres = this.usuarios.map(user => user.name);
+                
+                // Ordenamos alfabéticamente
+                nombres.sort((a, b) => a.localeCompare(b));
+                
+                nombres.forEach(nombre => {
+                    console.log(nombre);
+                });
+            }
+        }
+
+        // Instanciamos la clase para que el constructor se ejecute al cargar la página
+        // y los botones puedan llamar a los métodos a través de 'app'
+        const app = new AdministradorUsuarios();
+    </script>
+
+</body>
+</html>
